@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Citas Urgentes</title>
+</head>
+<body>
+    <h1>Citas Urgentes</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Fecha Cita No Res</th>
+        </tr>
+        <% results.forEach(cita => { %>
+        <tr>
+            <td><%= cita.Id_residente %></td>
+            <td><%= cita.nombre_res %></td>
+        </tr>
+        <% }) %>
+    </table>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulado</title>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <h1>SmartDate</h1>
+        </div>
+        <button id="abrir" class="abrir-menu"><i class="bi bi-list"></i></button>
+        <nav class="nav" id="nav">
+            <button id="cerrar" class="cerrar-menu"><i class="bi bi-x-lg"></i></button>
+            <ul class="nav-list">
+                <li><a href="#">Inicio</a></li>
+                <li><a href="#">Acerca de</a></li>
+                <li><a href="#">Servicios</a></li>
+                <li><a href="#">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Calendario Citas</h2>
+        <div class="cale">
+            <section>
+                <h2>Días disponibles</h2>
+                <p>Elige el día entre los de la lista:</p>
+                <form id="inputContainer">
+                    <input type="hidden" name="idResidente" value="<%= idResidente %>">
+                </form>
+            </section>
+            <section>
+                <h2>Horarios disponibles</h2>
+                <p>Elige el día entre los de la lista:</p>
+                <form action="/reserve_cita" class="horas" method="post" id="hourInputsContainer">
+                    <input type="hidden" name="idResidente" value="<%= idResidente %>">
+                </form>
+            </section>
+        </div>
+        <a href="#" class="volver"><i class="bi bi-arrow-left-circle-fill"></i>Volver</a>
+    </main>
+    <footer>
+        <div class="logo">
+            <h3>SmartDate</h3>
+        </div>
+        <div class="legal">
+            <a href="#">Cookies</a>
+            <a href="#">Avisos Legales</a>
+            <a href="#">Privacidad</a>
+        </div>
+    </footer>
+    <script>
+        const nav = document.querySelector('#nav');
+        const abrir = document.querySelector('#abrir');
+        const cerrar = document.querySelector('#cerrar');
+
+        abrir.addEventListener('click', () => {
+            nav.classList.add('visible');
+        });
+
+        cerrar.addEventListener('click', () => {
+            nav.classList.remove('visible');
+        });
+
+        function generateWeekdayInputs() {
+            const container = document.getElementById('inputContainer');
+            container.innerHTML = '';  
+            const today = new Date();
+            let currentDate = new Date(today);
+            let inputsGenerated = 0;
+
+            while (inputsGenerated < 5) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                const dayOfWeek = currentDate.getDay();
+
+                if (dayOfWeek !== 6 && dayOfWeek !== 0) {
+                    const input = document.createElement('input');
+                    input.type = 'button';
+                    input.value = currentDate.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' });
+                    input.addEventListener('click', () => generateHourInputs(currentDate));
+                    container.appendChild(input);
+                    inputsGenerated++;
+                }
+            }
+        }
+
+        function generateHourInputs(date) {
+            const container = document.getElementById('hourInputsContainer');
+            container.innerHTML = '';  
+            const hours = [
+                '09:00',
+                '10:00',
+                '11:00',
+                '12:00',
+                '13:00',
+                '14:00'
+            ];
+
+            hours.forEach(hour => {
+                const hourInput = document.createElement('input');
+                hourInput.setAttribute("class", "hora")
+                hourInput.type = 'button';
+                hourInput.value = hour;
+                hourInput.addEventListener('click', () => createSubmitButton(date, hour));
+                container.appendChild(hourInput);
+            });
+        }
+
+        function createSubmitButton(date, hour) {
+            const container = document.getElementById('hourInputsContainer');
+            const existingButton = container.querySelector('button[type="submit"]');
+            if (existingButton) {
+                existingButton.remove();
+            }
+
+            const submitButton = document.createElement('button');
+            submitButton.type = 'submit';
+            submitButton.textContent = 'Reservar Cita';
+
+            const dateInput = document.createElement('input');
+            dateInput.type = 'hidden';
+            dateInput.name = 'date';
+            dateInput.value = date.toISOString().split('T')[0];
+
+            const hourInput = document.createElement('input');
+            hourInput.type = 'hidden';
+            hourInput.name = 'hour';
+            hourInput.value = hour;
+
+            container.appendChild(dateInput);
+            container.appendChild(hourInput);
+            container.appendChild(submitButton);
+        }
+
+        document.addEventListener('DOMContentLoaded', generateWeekdayInputs);
+        setInterval(generateWeekdayInputs, 24 * 60 * 60 * 1000);
+    </script>
+</body>
+
+</html>
