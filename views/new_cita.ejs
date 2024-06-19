@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consulado</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -30,14 +31,12 @@
                 <h2>Días disponibles</h2>
                 <p>Elige el día entre los de la lista:</p>
                 <form id="inputContainer">
-                    <input type="hidden" name="idResidente" value="<%= idResidente %>">
                 </form>
             </section>
             <section>
                 <h2>Horarios disponibles</h2>
                 <p>Elige el día entre los de la lista:</p>
                 <form action="/reserve_cita" class="horas" method="post" id="hourInputsContainer">
-                    <input type="hidden" name="idResidente" value="<%= idResidente %>">
                 </form>
             </section>
         </div>
@@ -54,6 +53,7 @@
         </div>
     </footer>
     <script>
+        //este es myapp.js =====MENU HAMBURGESA=====
         const nav = document.querySelector('#nav');
         const abrir = document.querySelector('#abrir');
         const cerrar = document.querySelector('#cerrar');
@@ -66,6 +66,8 @@
             nav.classList.remove('visible');
         });
 
+
+        /* este es app_dia_hora.js =======LA PARTE DEL FORMULARIO======= */
         function generateWeekdayInputs() {
             const container = document.getElementById('inputContainer');
             container.innerHTML = '';  
@@ -81,32 +83,35 @@
                     const input = document.createElement('input');
                     input.type = 'button';
                     input.value = currentDate.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' });
-                    input.addEventListener('click', () => generateHourInputs(currentDate));
+                    input.addEventListener('click', () => loadAvailableHours(currentDate));
                     container.appendChild(input);
                     inputsGenerated++;
                 }
             }
         }
 
-        function generateHourInputs(date) {
+        function loadAvailableHours(date) {
             const container = document.getElementById('hourInputsContainer');
             container.innerHTML = '';  
-            const hours = [
-                '09:00',
-                '10:00',
-                '11:00',
-                '12:00',
-                '13:00',
-                '14:00'
-            ];
+            const formattedDate = date.toISOString().split('T')[0];
 
-            hours.forEach(hour => {
-                const hourInput = document.createElement('input');
-                hourInput.setAttribute("class", "hora")
-                hourInput.type = 'button';
-                hourInput.value = hour;
-                hourInput.addEventListener('click', () => createSubmitButton(date, hour));
-                container.appendChild(hourInput);
+            $.ajax({
+                url: '/available-hours',
+                type: 'GET',
+                data: { date: formattedDate },
+                success: function(hours) {
+                    hours.forEach(hour => {
+                        const hourInput = document.createElement('input');
+                        hourInput.setAttribute("class", "hora")
+                        hourInput.type = 'button';
+                        hourInput.value = hour;
+                        hourInput.addEventListener('click', () => createSubmitButton(date, hour));
+                        container.appendChild(hourInput);
+                    });
+                },
+                error: function(err) {
+                    console.error('Error fetching available hours:', err);
+                }
             });
         }
 

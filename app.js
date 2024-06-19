@@ -47,15 +47,38 @@ app.get('/', (req, res) => {
 });
 
 // Route to render the form with route parameter
-app.get('/new-cita/:idResidente', (req, res) => {
-    const idResidente = req.params.idResidente;
-    console.log("idResidente:", idResidente);
-    res.render('new_cita', { idResidente });
+app.get('/new-cita', (req, res) => {
+    res.render('new_cita');
 });
+
+// Rota para buscar horas disponíveis
+app.get('/available-hours', (req, res) => {
+    const date = req.query.date;
+
+    const query = `
+        SELECT hora_cita_res 
+        FROM cita_dni_res 
+        WHERE fecha_cita_res = ?`;
+    
+    connection.query(query, [date], (error, results) => {
+        if (error) {
+            console.error('Error fetching available hours:', error);
+            res.status(500).send('Error fetching available hours');
+            return;
+        }
+
+        const reservedHours = results.map(result => result.hora_cita_res);
+        const allHours = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00"];
+        const availableHours = allHours.filter(hour => !reservedHours.includes(hour));
+        
+        res.json(availableHours);
+    });
+});
+
 
 // Route to handle form submission
 app.post('/reserve_cita', (req, res) => {
-    const { idResidente, date, hour } = req.body;
+    const { date, hour } = req.body;
 
     const insertCita = `INSERT INTO cita_dni_res (id_residente, fecha_cita_res, hora_cita_res) VALUES (?, ?, ?)`;
     connection.query(insertCita, [2, date, hour], (error, results) => {
@@ -65,13 +88,13 @@ app.post('/reserve_cita', (req, res) => {
             return;
         }
         console.log("Cita reservada:", results);
-        console.log(`Cita reservada para el ${date} a las ${hour}, ${idResidente}`);
-        res.send(`Cita reservada para el ${date} a las ${hour}, ${idResidente}`);
+        console.log(`Cita reservada para el ${date} a las ${hour}`);
+        res.send(`Cita reservada para el ${date} a las ${hour}`);
     });
      
 
     // For testing purposes, send a response immediately
-    res.send(`Cita reservada para el ${date} a las ${hour}`);
+    res.render('new_cita');
 });
 
 const PORT = 3000;
