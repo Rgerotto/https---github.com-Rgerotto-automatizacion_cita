@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('./parcials/head') %>
+    <link rel="stylesheet" href="/css/datos-usuario.css">
+</head>
+
+<body>
+    <header>
+        <%- include('./parcials/header') %>
+    </header>
+
+    <main>
+        <h2>Tus Datos</h2>
+        <section>
+            <table id="tabla">
+                <tr>
+                    <th>Nombre</th>
+                    <td><%= user.nombre_res %></td>
+                </tr>
+                <tr>
+                    <th>Apellido</th>
+                    <td><%= user.apellido_res %></td>
+                </tr>
+                <tr>
+                    <th>Ciudad de Residencia</th>
+                    <td><%= user.ciudad_aire_res %></td>
+                </tr>
+                <tr>
+                    <th>Teléfono</th>
+                    <td><%= user.telefono_res %></td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td><%= user.email_res%></td>
+                </tr>
+                <tr>
+                    <th>AIRE de pertencia</th>
+                    <td><%= user.consulado_pertenencia %></td>
+                </tr>
+                <tr>
+                    <th>Número de pasaporte</th>
+                    <td><%= user.num_pasaporte_res %></td>
+                </tr>
+                <tr>
+                    <th>Número de DNI</th>
+                    <td><%= user.num_dni_res %></td>
+                </tr>
+            </table>
+            <div class="actualizar">
+                <p>Si hay algún cambio en los datos por favor comunicalo haciendo click en el enlace da abajo</p>
+                <a href="#">Actualización de datos</a>
+            </div>
+        </section>
+        <a href="#" class="volver"><i class="bi bi-arrow-left-circle-fill"></i>Volver</a>
+    </main>
+
+    <%- include('./parcials/footer') %>
+</body>
+
+</html>

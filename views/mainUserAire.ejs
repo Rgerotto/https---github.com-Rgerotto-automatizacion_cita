@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('./parcials/head') %>
+    <link rel="stylesheet" href="/css/main-res-aire.css">
+</head>
+
+<body>
+    <header>
+        <%- include('./parcials/header') %>
+    </header>
+
+    <main>
+        <div class="log">
+            <h2>Bienvenido <%= user.nombre_res %> <%= user.apellido_res %></h2>
+            <a href="#" class="logout">Cerrar Sessión</a>
+        </div>
+        <div class="opciones">
+            <a href="#">Programar cita Certificaciones</a>
+            <a href="calendario/<%= user.id_residente %>">Progamar cita Urgente</a>
+            <a href="user/<%= user.id_residente %>">Mis Datos</a>
+        </div>
+    </main>
+    <%- include('./parcials/footer') %>
+</body>
+
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('./parcials/head') %>
+    <link rel="stylesheet" href="/css/intro-user.css">
+</head>
+
+<body>
+    <header>
+        <%- include('./parcials/header') %>
+    </header>
+
+    <main>
+        <div class="contain">
+            <h2>Crear nuevo usuario</h2>
+            <form class="insert-user" action="/insert" method="post">
+                <fieldset>
+                    <legend>Datos Personale:</legend>
+                    <div class="insert">
+                        <label for="name">Nombre:</label>
+                        <input type="text" name="name" id="name">
+                    </div>
+                    <div class="insert">
+                        <label for="apellido">Apellido:</label>
+                        <input type="text" name="apellido" id="apellido">
+                    </div>
+                    <div class="insert">
+                        <label for="tel">Telefono:</label>
+                        <input type="tel" name="tel" id="tel">
+                    </div>
+                    <div class="insert">
+                        <label for="ciudad">Ciudad de residencia:</label>
+                        <input type="text" name="ciudad" id="ciudad">
+                    </div>
+                    <div class="insert">
+                        <label for="email">Correo electronico:</label>
+                        <input type="text" name="email" id="email">
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>Datos Administrativos:</legend>
+                    <div class="insert">
+                        <label for="consulado">Consulado de pertenencia:</label>
+                        <input type="text" name="consulado" id="consulado">
+                    </div>
+                    <div class="insert">
+                        <label for="dni">DNI:</label>
+                        <input type="text" name="dni" id="dni">
+                    </div>
+                    <div class="insert">
+                        <label for="fin-dni">Caducidad DNI</label>
+                        <input type="date" name="finDni" id="fin-dni">
+                    </div>
+                    <div class="insert">
+                        <label for="pasaporte">Pasaporte</label>
+                        <input type="text" name="pasaporte" id="pasaporte">
+                    </div>
+                    <div class="insert">
+                        <label for="fin-psp">Caducidad pasaporte:</label>
+                        <input type="date" name="finPsp" id="fin-psp">
+                    </div>
+                    <div class="insert">
+                        <label for="password">Número secreto:</label>
+                        <input type="text" name="password" id="password">
+                    </div>
+                </fieldset>
+                <div class="botones">
+                    <button type="submit">Registrar</button>
+                    <button type="reset">Borrar</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <%- include('./parcials/footer') %>
+</body>
+
+</html>

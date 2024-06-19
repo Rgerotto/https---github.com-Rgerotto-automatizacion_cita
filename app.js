@@ -1,3 +1,4 @@
+
 const express = require('express');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
@@ -9,6 +10,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Set EJS as templating engine
 app.set('view engine', 'ejs');
+
+// Middleware to serve static files
+app.use(express.static('public'));
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -27,34 +31,92 @@ connection.connect((err) => {
 });
 
 app.get('/', (req, res) => {
-    const selec = "SELECT * FROM residentes_aire";
-    connection.query(selec, (error, results) => {
-        if (error) {
-            console.error('Error querying residentes_aire:', error);
-            res.status(500).send('Error retrieving data');
-            return;
+    res.render('indexUser')
+})
+app.get('/loginRes', (req, res) => {
+    res.render('loginRes', { error: null, classError: '' });
+})
+
+/* LOGIN DE USUARIO */
+
+app.post('/loginRes', (req, res) => {
+    //Obtener datos desde el body
+    const email = req.body.email;
+    const password = req.body.password;
+    console.log(email, password)
+    //Si no se proporcionan el mail o la contraseña devolver un mensaje de error
+    if (!email || !password) {
+        return res.render('loginRes', { error: 'Todos los campos son obligatorios', classError: 'error' });
+    }
+
+    //Si se proporciona todo verificar si existe el usuario
+    connection.query('SELECT * FROM residentes_aire WHERE email_res = ?', [email], async (err, result) => {
+        if (err) {
+            console.error('Error en la consulta a la base de datos:', err);
+            return res.status(500).render('loginRes', { error: 'Error en el servidor', classError: 'error' });
         }
-        console.log("teste", results);
-        if (results.length > 0) {
-            const resident = results[0];
-            const idResidente = resident.Id_residente;
-            console.log("id_residente:", idResidente);
-            res.render('index', { results, idResidente });
-        } else {
-            res.render('index', { results, idResidente: null });
+        //si no existe devolver un mensaje de usuario no encontrado
+        if (result.length === 0) {
+            //console.log("Usuario no encontrado");
+            return res.render('loginRes', { error: 'Usuario o contraseña incorrectos', classError: 'error' });
         }
+        //Guardar el primer usuario encontrado en una variable
+        const user = result[0];
+        console.log("Usuario encontrado:", user);
+
+        // Comparar la contraseña proporcionada con la almacenada en la base de datos
+        if (password !== user.password_res) {
+            console.log("Contraseña incorrecta");
+            return res.render('loginRes', { error: 'Usuario o contraseña incorrectos', classError: 'error' });
+        }
+
+        // Si las credenciales son válidas, generar token JWT y configurar las caracteristicas
+        const idUser = user.id_residente;
+        const token = jwt.sign({ id: idUser }, process.env.JWT_SECRETO, { expiresIn: process.env.JWT_TIEMPO_EXPIRE });
+        //Configurar la cookies
+        const cookiesOptions = {
+            expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000),
+            httpOnly: true
+        };
+
+        //proporcionar la cookiec, primer parametro: nombre cookie, segundo: el token generado, tercero: la caracteristicas de la cookie
+        res.cookie('jwt', token, cookiesOptions);
+
+        // acceder a la página inicial del perfil de usuario
+        res.render('mainUserAire', { user });
+
     });
 });
 
+
+/* RUTA PARA MOSTRAR DATOS DE USUARIO*/
+app.get('/user/:id', (req, res) => {
+    const idUser = req.params.id;
+    const selectUser = `SELECT * FROM residentes_aire WHERE id_residente = ${idUser}`;
+    connection.query(selectUser, (err, result) => {
+        if (err) {
+            console.error('Error en la consulta a la base de datos:', err);
+            return res.status(500).render('loginRes', { error: 'Error en el servidor', classError: 'error' });
+        }
+        if (result.length === 0) {
+            console.log("Usuario no encontrado");
+            return res.render('loginRes', { error: 'Usuario o contraseña incorrectos', classError: 'error' });
+        }
+        const user = result[0];
+        console.log("Usuario encontrado:", user);
+        res.render('userDates', { user: user });
+    })
+})
+
 // Route to render the form with route parameter
-app.get('/new-cita', (req, res) => {
-    res.render('new_cita');
+app.get('/calendario', (req, res) => {
+    res.render('calendarioAuto');
 });
 
 // Rota para buscar horas disponíveis
 app.get('/available-hours', (req, res) => {
-    const date = req.query.date;
-
+    const {date, hour} = req.query;
+    console.log("date from get:", date)
     const query = `
         SELECT hora_cita_res 
         FROM cita_dni_res 
@@ -79,191 +141,28 @@ app.get('/available-hours', (req, res) => {
 // Route to handle form submission
 app.post('/reserve_cita', (req, res) => {
     const { date, hour } = req.body;
-
+    console.log("date from serve:", date)
+    /* const parsedDate = new Date(date);
+    const formattedDate = parsedDate.toISOString().split('T')[0];
+    console.log("app.post", formattedDate) */
     const insertCita = `INSERT INTO cita_dni_res (id_residente, fecha_cita_res, hora_cita_res) VALUES (?, ?, ?)`;
     connection.query(insertCita, [2, date, hour], (error, results) => {
         if (error) {
             console.error('Error inserting cita_dni_res:', error);
-            res.status(500).send('Error reserving appointment');
+            if (!res.headersSent) {
+                res.status(500).send('Error reserving appointment');
+            }
             return;
         }
-        console.log("Cita reservada:", results);
         console.log(`Cita reservada para el ${date} a las ${hour}`);
-        res.send(`Cita reservada para el ${date} a las ${hour}`);
+        if (!res.headersSent) {
+            res.send(`Cita reservada para el ${date} a las ${hour}`);
+        }
     });
-     
-
-    // For testing purposes, send a response immediately
-    res.render('new_cita');
 });
+
 
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
-
-
-/* const express = require('express');
-const mysql = require('mysql');
-
-const app = express();
-
-// Set EJS as templating engine
-app.set('view engine', 'ejs');
-
-const connection = mysql.createConnection({
-    host: "localhost",
-    port: "3309",
-    user: "rafaelcoelho",
-    //password: "123456", // Uncomment and add your password
-    database: "consulado"
-});
-
-connection.connect((err) => {
-    if (err) {
-        console.error('Error connecting to the database:', err);
-        return;
-    }
-    console.log('Connected to the MySQL server.');
-});
-
-app.get('/', (req, res) => {
-    const selectQuery = "SELECT * FROM cita_urgente";
-    connection.query(selectQuery, (error, results) => {
-        if (error) {
-            console.error('Error executing query:', error);
-            res.status(500).send('Error executing query');
-            return;
-        }
-
-        // Format the date before passing to the template
-        results = results.map(result => {
-            if (result.fecha_cita_no_res) {
-                const date = new Date(result.fecha_cita_no_res);
-                const data = date.toLocaleDateString()
-                const splice = data.split('/')
-                const day = splice[0].toString().padStart(2, "0")
-                const month = splice[1]
-                const year = splice[2]
-                const fullDate = `${year}/${month}/${day}`
-                //result.formattedDate = date.toLocaleDateString();
-                //console.log(`teste ${fullDate}`)
-            } else {
-                result.formattedDate = 'N/A';
-            }
-            return result;
-        });
-
-        res.render('index', { citas: results }); // Render the index.ejs view with the data
-    });
-});
-
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
-});
- */
-
-/* 
-const express = require('express');
-const mysql = require('mysql');
-
-const app = express();
-
-// Set EJS as templating engine
-app.set('view engine', 'ejs');
-
-const connection = mysql.createConnection({
-    host: "localhost",
-    port: "3309",
-    user: "rafaelcoelho",
-    //password: "123456", // Uncomment and add your password
-    database: "consulado"
-});
-
-connection.connect((err) => {
-    if (err) {
-        console.error('Error connecting to the database:', err);
-        return;
-    }
-    console.log('Connected to the MySQL server.');
-});
-
-
-app.get('/', (req, res) => {
-    const selectQuery = "SELECT * FROM cita_urgente";
-    connection.query(selectQuery, (error, results) => {
-        if (error) {
-            console.error('Error executing query:', error);
-            res.status(500).send('Error executing query');
-            return;
-        }
-
-        // Format the date before passing to the template
-        results = results.map(result => {
-            if (result.fecha_cita_no_res) {
-                const date = new Date(result.fecha_cita_no_res);
-                const formattedDate = date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-                result.formattedDate = formattedDate;
-                console.log(formattedDate)
-            } else {
-                result.formattedDate = 'N/A';
-            }
-            return result;
-        });
-
-        res.render('index', { citas: results }); // Render the index.ejs view with the data
-    });
-});
-
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
-});
- */
-
-
-
-
-/* const selectQuery = "SELECT * FROM cita_urgente";
-    connection.query(selectQuery, (error, results) => {
-        if (error) {
-            console.error('Error executing query:', error);
-            res.status(500).send('Error executing query');
-            return;
-        }
-
-        // Format the date before passing to the template
-        results = results.map(result => {
-            if (result.fecha_cita_no_res) {
-                const date = new Date(result.fecha_cita_no_res);
-                const formattedDate = date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-                result.formattedDate = formattedDate;
-            } else {
-                result.formattedDate = 'N/A';
-            }
-            return result;
-        });
-
-        res.render('index', { citas: results }); // Render the index.ejs view with the data
-    }); */
-
-
-    // Route to handle form submission
-    /*
- app.post('/new-cita', (req, res) => {
-    const { tipo_ciutadano, fecha_cita_no_res, hora_cita_no_res, motivo_cita, n_denuncia, id_no_res, id_residente } = req.body;
-
-    const insertQuery = `
-        INSERT INTO cita_urgente (tipo_ciutadano, fecha_cita_no_res, hora_cita_no_res, motivo_cita, n_denuncia, id_no_res, id_residente)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-    connection.query(insertQuery, [tipo_ciutadano, fecha_cita_no_res, hora_cita_no_res, motivo_cita, n_denuncia, id_no_res, id_residente], (error, results) => {
-        if (error) {
-            console.error('Error executing query:', error);
-            res.status(500).send('Error executing query');
-            return;
-        }
-        res.redirect('/');
-    });
-});*/

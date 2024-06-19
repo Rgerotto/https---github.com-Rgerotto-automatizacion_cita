@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulado</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <h1>SmartDate</h1>
+        </div>
+        <button id="abrir" class="abrir-menu"><i class="bi bi-list"></i></button>
+        <nav class="nav" id="nav">
+            <button id="cerrar" class="cerrar-menu"><i class="bi bi-x-lg"></i></button>
+            <ul class="nav-list">
+                <li><a href="#">Inicio</a></li>
+                <li><a href="#">Acerca de</a></li>
+                <li><a href="#">Servicios</a></li>
+                <li><a href="#">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Calendario Citas</h2>
+        <div class="cale">
+            <section>
+                <h2>Días disponibles</h2>
+                <p>Elige el día entre los de la lista:</p>
+                <form id="inputContainer">
+                </form>
+            </section>
+            <section>
+                <h2>Horarios disponibles</h2>
+                <p>Elige el día entre los de la lista:</p>
+                <form id="hourForm" action="/reserve_cita" method="post">
+                    <div id="inputContainer"></div>
+                    <div id="hourInputsContainer"></div>
+                </form>
+            </section>
+        </div>
+        <a href="#" class="volver"><i class="bi bi-arrow-left-circle-fill"></i>Volver</a>
+    </main>
+
+    <footer>
+        <div class="logo">
+            <h3>SmartDate</h3>
+        </div>
+        <div class="legal">
+            <a href="#">Cookies</a>
+            <a href="#">Avisos Legales</a>
+            <a href="#">Privacidad</a>
+        </div>
+    
+    <%- include('./parcials/footer') %>
+    <script src="../js/app_dia_cita.js"></script>
+</body>
+
+</html>

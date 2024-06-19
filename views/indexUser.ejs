@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('./parcials/head') %>
+    <link rel="stylesheet" href="/css/main-index.css">
+</head>
+
+<body>
+    <header>
+        <%- include('./parcials/header') %>
+    </header>
+
+    <main>
+        <div class="bienvenida">
+            <h2>Bienvenidos a la app de citas del consulado Italiano</h2>
+        </div>
+        <div class="img">Aquí habrá una imagen</div>
+        <div class="container">
+            <div class="acceso1">
+                <h4>Si ya tienes registro AIRE</h4>
+                <a class="boton" href="loginRes">Residente AIRE</a>
+            </div>
+            <div class="acceso2">
+                <h4>Si no tienes registro AIRE</h4>
+                <a class="boton" href="#">No residente AIRE</a>
+            </div>
+        </div>
+    </main>
+    <%- include('./parcials/footer') %>
+</body>
+
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('./parcials/head') %>
+        <link rel="stylesheet" href="/css/formulario.css">
+</head>
+
+<body>
+    <header>
+        <%- include('./parcials/header') %>
+    </header>
+
+    <main>
+        <h2>Bienvenidos a la app de citas del consulado Italiano</h2>
+        <p class="<%= classError %>"><%= error %></p>
+        <div class="form-log">
+            <form action="#" method="post">
+                <h3>Iniciar Sesión</h3>
+                <fieldset>
+                    <div class="campo">
+                        <label for="email">Correo electrónico *</label>
+                        <input type="email" name="email" id="email">
+                    </div>
+                    <div class="campo">
+                        <label for="password">Número de identificación *</label>
+                        <input type="password" name="password" id="password">
+                    </div>
+                    <button type="submit" class="session">Iniciar Sesión</button>
+
+                </fieldset>
+                <div class="campo">
+                    <a href="#">Olvidé mi código secreto</a>
+                </div>
+            </form>
+            <div class="info">
+                <h3>¡Información importante!</h3>
+                <p>El correo electrónico tiene que coincidir con el que tramitaste tu inscripción al AIRE.</p>
+                <p>El número secreto lo encontrarás en el certificado de inscripción al AIRE.</p>
+                <P>En el caso haya perdido su número pongase en contacto con nosotro tramite el enlace </P>
+                <a href="#">Olvidé mi código secreto</a>
+            </div>
+        </div>
+        <a href="/" class="volver"><i class="bi bi-arrow-left-circle-fill"></i>Volver</a>
+    </main>
+    <%- include('./parcials/footer') %>
+</body>
+
+</html>

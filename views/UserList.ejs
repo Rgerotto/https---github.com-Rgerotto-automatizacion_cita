@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('./parcials/head') %>
+    <link rel="stylesheet" href="/css/main-back.css">
+</head>
+
+<body>
+    <header>
+        <%- include('./parcials/header') %>
+    </header>
+
+    <main>
+        <a class="getform" href="formulario">Añadir nuevo usuario </a>
+        <div class="table-container">
+            <table id="tabla" class="table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Email</th>
+                        <th>DNI</th>
+                        <th data-type="date" data-format="MYSQL">Caducidad DNI</th>
+                        <th>Pasaporte</th>
+                        <th data-type="date" data-format="DD/MM/YYYY">Caducidad Pasaporte</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- genero una row de la tabla por cada coche -->
+                    <% usuario.forEach(user => { %>
+                    <tr>
+                        <td><%= user.nombre_res %></td>
+                        <td><%= user.apellido_res %></td>
+                        <td><%= user.email_res %></td>
+                        <td><%= user.num_dni_res %></td>
+                        <td><%= user.fin_dni_res %></td>
+                        <td><%= user.num_pasaporte_res %></td>
+                        <td><%= user.fin_pasaporte_res %></td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3/dist/umd/simple-datatables.min.js"></script>
+    <script src="/js/table.js"></script>
+    <%- include('./parcials/footer') %>
+</body>
+
+</html>
